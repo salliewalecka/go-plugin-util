@@ -53,22 +53,28 @@ public class HttpRepoURL extends RepoUrl {
 
     public void checkConnection(String urlOverride) {
         OkHttpClient client = getHttpClient();
+        Request request;
         if (credentials.provided()) {
             String usernamePasswordCredentials = com.squareup.okhttp.Credentials.basic(credentials.getUser(),credentials.getPassword());
-            client.setAuthenticator(new Au)
-            client.getCredentialsProvider().setCredentials(AuthScope.ANY, usernamePasswordCredentials);
+            request = new Request.Builder()
+                    .url((urlOverride == null) ? url : urlOverride)
+                    .header("Authorization", usernamePasswordCredentials)
+                    .build();
+        } else {
+            request = new Request.Builder()
+                    .url((urlOverride == null) ? url : urlOverride)
+                    .build();
         }
-        HttpGet method = new HttpGet((urlOverride == null) ? url : urlOverride);
         try {
-            HttpResponse response = client.execute(method);
-            if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-                throw new RuntimeException(response.getStatusLine().toString());
+            Response response = client.newCall(request).execute();
+            if (!response.isSuccessful()) {
+                throw new RuntimeException("Unexpected code " + response.code());
+            } else {
+                ResponseBody body = response.body();
+                System.out.println(body.string());
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
-        } finally {
-            method.releaseConnection();
-            client.getConnectionManager().shutdown();
         }
     }
 
