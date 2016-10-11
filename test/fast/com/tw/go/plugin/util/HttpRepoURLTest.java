@@ -18,8 +18,8 @@ public class HttpRepoURLTest {
         try {
             RepoUrl.create("http://the-internet.herokuapp.com/status_codes/500", null, null).checkConnection();
             fail("should fail");
-        } catch (RuntimeException e) {
-            assertTrue(e.getCause() instanceof UnknownHostException);
+        } catch (Exception e) {
+            assertTrue(e.getMessage().contains("500"));
         }
     }
 }
