@@ -16,10 +16,10 @@ public class HttpRepoURLTest {
     @Test
     public void shouldFailCheckConnectionToTheRepoWhenUrlIsNotReachable() {
         try {
-            RepoUrl.create("http://nonexistentfqdngibberish.com", null, null).checkConnection();
+            RepoUrl.create("http://the-internet.herokuapp.com/status_codes/500", null, null).checkConnection();
             fail("should fail");
-        } catch (RuntimeException e) {
-            assertTrue(e.getCause() instanceof UnknownHostException);
+        } catch (Exception e) {
+            assertTrue(e.getMessage().contains("500"));
         }
     }
 }

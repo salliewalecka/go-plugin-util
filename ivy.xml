@@ -7,8 +7,7 @@
         <dependency org="org.apache.httpcomponents" name="httpcore" rev="4.2.4"/>
         <dependency org="junit" name="junit" rev="4.11"/>
         <dependency org="org.mockito" name="mockito-all" rev="1.9.5"/>
-        <dependency org="com.thoughtworks" name="go-plugin-api" rev="current">
-           <artifact name="go-plugin-api" url="http://www.thoughtworks.com/products/docs/go/current/help/resources/go-plugin-api-current.jar"/>
-        </dependency>
+        <dependency org="cd.go.plugin" name="go-plugin-api" rev="15.2.0"></dependency>
+        <dependency org="com.squareup.okhttp" name="okhttp" rev="2.7.5"/>
     </dependencies>
 </ivy-module>

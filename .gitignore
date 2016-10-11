@@ -1,7 +1,9 @@
 dist/*
 out/*
 target/*
+*.ipr
 *.iws
 go-plugin-api*.jar
 reports/*
 lib/*
+
