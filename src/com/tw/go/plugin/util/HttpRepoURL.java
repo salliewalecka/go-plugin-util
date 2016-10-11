@@ -1,5 +1,6 @@
 package com.tw.go.plugin.util;
 
+import com.squareup.okhttp.*;
 import com.thoughtworks.go.plugin.api.response.validation.ValidationError;
 import com.thoughtworks.go.plugin.api.response.validation.ValidationResult;
 import org.apache.http.HttpResponse;
@@ -11,22 +12,38 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.DefaultRedirectStrategy;
 import org.apache.http.params.CoreConnectionPNames;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 public class HttpRepoURL extends RepoUrl {
+
+//    public static final MediaType JSON
+//            = MediaType.parse("application/json; charset=utf-8");
+//
+//    OkHttpClient client = new OkHttpClient();
+//
+//    String post(String url, String json) throws IOException {
+//        RequestBody body = RequestBody.create(JSON, json);
+//        Request request = new Request.Builder()
+//                .url(url)
+//                .post(body)
+//                .build();
+//        Response response = client.newCall(request).execute();
+//        return response.body().string();i
+//    }
 
     public HttpRepoURL(String url, String user, String password) {
         super(url, user, password);
     }
 
-    public static DefaultHttpClient getHttpClient() {
-        DefaultHttpClient client = new DefaultHttpClient();
-        client.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT,5*1000);
-        client.setHttpRequestRetryHandler(new DefaultHttpRequestRetryHandler(3, false));
-        client.setRedirectStrategy(new DefaultRedirectStrategy());
+    public static OkHttpClient getHttpClient() {
+        OkHttpClient client = new OkHttpClient();
+        client.setConnectTimeout(5, TimeUnit.SECONDS);
+        //TODO: OKHttpClient doesn't offer configurable retry attempts. Do we extend it to retry 3 times (as before) or use default retry behavior?
+        //TODO: Used to configure redirect via the Apache DefaultRedirectStrategy(). Need to update handling of redirect using OkHttpClient.
+        client.setRetryOnConnectionFailure(true);
         return client;
     }
 
@@ -49,10 +66,10 @@ public class HttpRepoURL extends RepoUrl {
 
 
     public void checkConnection(String urlOverride) {
-        DefaultHttpClient client = getHttpClient();
+        OkHttpClient client = getHttpClient();
         if (credentials.provided()) {
-            UsernamePasswordCredentials usernamePasswordCredentials = new UsernamePasswordCredentials(credentials.getUser(), credentials.getPassword());
-            //setAuthenticationPreemptive
+            String usernamePasswordCredentials = com.squareup.okhttp.Credentials.basic(credentials.getUser(),credentials.getPassword());
+            client.setAuthenticator(new Au)
             client.getCredentialsProvider().setCredentials(AuthScope.ANY, usernamePasswordCredentials);
         }
         HttpGet method = new HttpGet((urlOverride == null) ? url : urlOverride);

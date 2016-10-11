@@ -8,5 +8,6 @@
         <dependency org="junit" name="junit" rev="4.11"/>
         <dependency org="org.mockito" name="mockito-all" rev="1.9.5"/>
         <dependency org="cd.go.plugin" name="go-plugin-api" rev="15.2.0"></dependency>
+        <dependency org="com.squareup.okhttp" name="okhttp" rev="2.7.5"/>
     </dependencies>
 </ivy-module>
