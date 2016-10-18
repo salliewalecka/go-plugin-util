@@ -1,5 +1,6 @@
 package com.tw.go.plugin.util;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.net.UnknownHostException;
@@ -21,5 +22,17 @@ public class HttpRepoURLTest {
         } catch (Exception e) {
             assertTrue(e.getMessage().contains("500"));
         }
+    }
+
+    @Test
+    public void shouldReturnUrlWithTrailingSlashWhenNoneIsPresent(){
+        HttpRepoURL httpRepoURL = new HttpRepoURL("http://url.com", "user", "password");
+        Assert.assertEquals("http://url.com/", httpRepoURL.getUrlStrWithTrailingSlash());
+    }
+
+    @Test
+    public void shouldNotAddTrailingSlashWhenOneIsPresent(){
+        HttpRepoURL httpRepoURL = new HttpRepoURL("http://url.com/", "user", "password");
+        Assert.assertEquals("http://url.com/", httpRepoURL.getUrlStrWithTrailingSlash());
     }
 }

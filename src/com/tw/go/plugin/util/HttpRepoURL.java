@@ -3,6 +3,9 @@ package com.tw.go.plugin.util;
 import com.squareup.okhttp.*;
 import com.thoughtworks.go.plugin.api.response.validation.ValidationError;
 import com.thoughtworks.go.plugin.api.response.validation.ValidationResult;
+import org.w3c.dom.Document;
+
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -45,17 +48,7 @@ public class HttpRepoURL extends RepoUrl {
     public void checkConnection(String urlOverride) {
         OkHttpClient client = getHttpClient();
         Request request;
-        if (credentials.provided()) {
-            String usernamePasswordCredentials = com.squareup.okhttp.Credentials.basic(credentials.getUser(),credentials.getPassword());
-            request = new Request.Builder()
-                    .url((urlOverride == null) ? url : urlOverride)
-                    .header("Authorization", usernamePasswordCredentials)
-                    .build();
-        } else {
-            request = new Request.Builder()
-                    .url((urlOverride == null) ? url : urlOverride)
-                    .build();
-        }
+        request = getRequest(urlOverride);
         try {
             Response response = client.newCall(request).execute();
             if (!response.isSuccessful()) {
@@ -103,5 +96,40 @@ public class HttpRepoURL extends RepoUrl {
         String urlStr = getUrlStr();
         if (urlStr.endsWith("/")) return urlStr;
         return urlStr + "/";
+    }
+
+    public Document download(String url) throws RuntimeException {
+        try {
+            Request request = getRequest(url);
+
+            Response response = getHttpClient().newCall(request).execute();
+            if(!response.isSuccessful()){
+                throw new RuntimeException(String.format("HTTP %s, %s",
+                        response.code(), response.message()));
+            }
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            return factory.newDocumentBuilder().parse(response.body().byteStream());
+
+        } catch (Exception ex) {
+            String message = String.format("%s (%s) while getting package feed for : %s ", ex.getClass().getSimpleName(), ex.getMessage(), url);
+            throw new RuntimeException(message, ex);
+        }
+    }
+
+    private Request getRequest(String urlOverride) {
+        Request request;
+        if (credentials.provided()) {
+            String usernamePasswordCredentials = com.squareup.okhttp.Credentials.basic(credentials.getUser(),credentials.getPassword());
+            request = new Request.Builder()
+                    .url((urlOverride == null) ? url : urlOverride)
+                    .header("Authorization", usernamePasswordCredentials)
+                    .build();
+        } else {
+            request = new Request.Builder()
+                    .url((urlOverride == null) ? url : urlOverride)
+                    .build();
+        }
+        return request;
     }
 }
